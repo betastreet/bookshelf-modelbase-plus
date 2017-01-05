@@ -1,6 +1,6 @@
 {
   "name": "bookshelf-modelbase-plus",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Extended functionality for REST operations with validation, filtering, ordering, importing records.",
   "main": "./lib",
   "scripts": {
@@ -11,7 +11,7 @@
     "url": "git+https://github.com/Wirnex/bookshelf-modelbase-plus.git"
   },
   "keywords": [
-    "bookshelf"
+    "bookshelf", "modelbase", "bookshelf-modelbase"
   ],
   "author": "Igor Pletenev",
   "license": "ISC",
