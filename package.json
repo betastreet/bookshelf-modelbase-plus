@@ -1,0 +1,45 @@
+{
+  "name": "bookshelf-modelbase-plus",
+  "version": "1.0.0",
+  "description": "Extended functionality for REST operations with validation, filtering, ordering, importing records.",
+  "main": "./lib",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Wirnex/bookshelf-modelbase-plus.git"
+  },
+  "keywords": [
+    "bookshelf"
+  ],
+  "author": "Igor Pletenev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Wirnex/bookshelf-modelbase-plus/issues"
+  },
+  "homepage": "https://github.com/Wirnex/bookshelf-modelbase-plus#readme",
+  "devDependencies": {
+    "eslint": "^3.12.0",
+    "eslint-config-airbnb-base": "^11.0.0",
+    "eslint-plugin-import": "^2.2.0",
+    "jest": "^17.0.3"
+  },
+  "eslintConfig": {
+    "env": {
+      "node": true,
+      "es6": true
+    },
+    "extents": "airbnb-base",
+    "sourceType": "module"
+  },
+  "jest": {
+    "bail": true,
+    "verbose": true,
+    "collectCoverage": true
+  },
+  "dependencies": {
+    "bookshelf-modelbase": "^2.10.2",
+    "lodash": "^4.17.4"
+  }
+}
