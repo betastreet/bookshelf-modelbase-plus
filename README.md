@@ -107,8 +107,8 @@ npm i --save bookshelf-modelbase-plus
         columns,
         (existingModel, updateData) => {
             if (existingModel.get('status') === 'deleted' && !updateData.status) {
-                // in this particular calback example callback raised cause one of the imported record with id = 120 is
-                // already in the table, so we check it's attribute *status* (might by any soft-deleting logic) and
+                // in this particular example a callback has been raised cause one of the imported record with id = 120
+                // is already in the table, so we check it's attribute *status* (might by any soft-deleting logic) and
                 // decide to restore soft deleted record and clean *old* values before save new one
                 updateData.status = 'enabled';
                 // clear existing model attributes, since they were set before deleting the record,
