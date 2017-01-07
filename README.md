@@ -92,13 +92,24 @@ npm i --save bookshelf-modelbase-plus
      * returns model with all attributes
      * @param {Array} data Array of records to import
      * @param {Array} columns data The set of columns will be used to fetch attribute values from the *data* object
-     * @param {Function} Optional callback with *bookshelf.Model* and *Object* params to restore soft-deleted records
+     * @param {Function} callback Optional callback with *bookshelf.Model* and *Object* params to restore soft-deleted records
      * @return {Promise(bookshelf.Model)} Bookshelf Collection of all Models
      */
     Budget
-        .importMany(data, columns, (existingModel, updateData) => {
+        .importMany([
+            { id: 120, name: 'Test name 00' },
+            { id: 139, name: 'Test name 01', status: 'enabled' },
+            {
+                // this will be definetely inserted
+                name: 'Test name 02', status: 'disabled',
+            },
+        ],
+        columns,
+        (existingModel, updateData) => {
             if (existingModel.get('status') === 'deleted' && !updateData.status) {
-                // restore soft deleted record when update
+                // in this particular calback example callback raised cause one of the imported record with id = 120 is
+                // already in the table, so we check it's attribute *status* (might by any soft-deleting logic) and
+                // decide to restore soft deleted record and clean *old* values before save new one
                 updateData.status = 'enabled';
                 // clear existing model attributes, since they were set before deleting the record,
                 // now are obsolete
