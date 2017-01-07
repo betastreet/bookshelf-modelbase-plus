@@ -1,8 +1,8 @@
 # bookshelf-modelbase-plus
 
 ## Why
-Bookshelf modelbase plugin offers good functionality, however when dealing with a number of similar REST microservieces
-is good to have shared codebase for common operations like paginated list, updating the records with validation,
+[Bookshelf modelbase](https://github.com/bsiddiqui/bookshelf-modelbase) plugin offers good functionality, however when dealing with a number of similar REST microservieces
+it is good to have shared codebase for common operations like paginated list, updating the records with validation,
 importing set of records and etc.
 
 ## Install
