@@ -31,7 +31,9 @@
     "eslint-config-airbnb-base": "^11.0.0",
     "eslint-plugin-import": "^2.2.0",
     "jest": "^17.0.3",
-    "knex": ">=0.6.10 <0.12.0"
+    "knex": ">=0.6.10 <0.12.0",
+    "sqlite": "^2.2.4",
+    "sqlite3": "^3.1.8"
   },
   "eslintConfig": {
     "env": {
