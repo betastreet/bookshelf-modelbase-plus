@@ -1,4 +1,5 @@
 # bookshelf-modelbase-plus
+[![Version](https://badge.fury.io/js/bookshelf-modelbase-plus.svg)](http://badge.fury.io/js/bookshelf-modelbase-plus)
 [![Build Status](https://travis-ci.org/Wirnex/bookshelf-modelbase-plus.svg?branch=master)](https://travis-ci.org/Wirnex/bookshelf-modelbase-plus)
 
 ## Why
