@@ -1,6 +1,6 @@
 'use strict'
 
-jest.autoMockOff();
+jest.disableAutomock();
 
 const bookshelf = require('../db').bookshelf;
 const User = require('../db/models/user');
@@ -95,6 +95,67 @@ describe('database querying', () => {
             .then((models) => {
                 expect(models.length).toBe(1);
                 expect(models.at(0).get('first_name')).toBe('First Name User 1 Test');
+                done();
+            })
+            .catch((err) => {
+                expect(1).toBe(err);
+                done();
+            });
+    });
+
+    it('should update an entry by composite pKey', (done) => {
+        User
+            .updateOneByCompositePKey({ email: 'emailtest@user1.com', address: 'Address to delete'}, User.columns)
+            .then((updatedModel) => {
+                expect(updatedModel.get('address')).toBe('Address to delete');                    
+                done();
+            })
+            .catch((err) => {
+                expect(1).toBe(err);
+                done();
+            });
+    });
+
+    it('should update an entry by id', (done) => {
+        User
+            .getList({ email: 'emailtest@user2.com', limit: 1 }, User.columns)
+            .then((models) => {
+                 User
+                    .updateOneById({ address: 'Address to delete' }, models.at(0).get('id'), User.columns)
+                    .then((updatedModel) => {  
+                        expect(updatedModel.get('address')).toBe('Address to delete');                    
+                        done();
+                    })
+                    .catch((err) => {
+                        expect(1).toBe(err);
+                        done();
+                    });
+            })
+            .catch((err) => {
+                expect(1).toBe(err);
+                done();
+            });
+    });
+
+
+    it('should destroy an entry by composite key', (done) => {
+        User
+            .destroyOneByCompositePKey({ email: 'emailtest@user0.com'})
+            .then((cnt) => {
+                expect(1).toBe(cnt);                    
+                done();
+            })
+            .catch((err) => {
+                expect(1).toBe(err);
+                done();
+            });
+    });
+
+    it('should destroy many entries by where clause', (done) => {
+        User
+            .destroyMany({where: { address: 'Address to delete'}})
+            .then((cnt) => {
+                expect(cnt).toBe(2);                    
                 done();
             })
             .catch((err) => {

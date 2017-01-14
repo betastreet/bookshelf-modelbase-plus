@@ -70,10 +70,10 @@ npm i --save bookshelf-modelbase-plus
         });
 ```
 
-### model.updateOne
+### model.updateOneById
 ```js
     /**
-     * Update model and revalidate all attributes before saving with modelbase Joi validation (if set)
+     * Update model through ID and revalidate all attributes before saving with modelbase Joi validation (if set)
      * returns model with all attributes
      * @param {Object} data
      * @param {Number} id
@@ -81,8 +81,37 @@ npm i --save bookshelf-modelbase-plus
      * @return {Promise(bookshelf.Model)} Bookshelf Collection of all Models
      */
     Budget
-        .updateOne(data, id, ['id', 'name', 'status'])
+        .updateOneById(data, id, ['id', 'name', 'status'])
         .then((model) => {
+            //
+        });
+```
+
+### model.updateOneByCompositePKey
+```js
+    /**
+     * Update model through composite pKEY lookup and revalidate all attributes before saving with modelbase Joi validation (if set)
+     * returns model with all attributes
+     * @param {Object} data
+     * @param {Array} columns data The set of columns will be used to fetch attribute values from the *data* object including the composite key
+     * @return {Promise(bookshelf.Model)} Bookshelf Collection of all Models
+     */
+    Budget
+        .updateOneByCompositePKey(data, ['id', 'name', 'status'])
+        .then((model) => {
+            //
+        });
+```
+
+### model.destroyOneByCompositePKey
+```js
+    /**
+     * Destroys  model through composite pKEY lookup 
+     * @param {Object} options should have the composite key fields
+     */
+    Budget
+        .destroyOneByCompositePKey(options)
+        .then((cnt) => {
             //
         });
 ```
@@ -127,4 +156,17 @@ npm i --save bookshelf-modelbase-plus
             return next();
         })
         .catch(err => next(err));
+```
+
+### model.destroyMany
+```js
+    /**
+     * Destroys a set of model through where condition 
+     * @param {Object} options.where should have the where condtions for destroy
+     */
+    Budget
+        .destroyMany(options)
+        .then((cnt) => {
+            //
+        });
 ```
