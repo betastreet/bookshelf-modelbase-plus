@@ -116,6 +116,19 @@ describe('database querying', () => {
             });
     });
 
+    it('should not update an entry by composite pKey when no corresponding record exists', (done) => {
+        User
+            .updateOneByCompositePKey({ email: 'emailtestNONEXISTING@user1.com', address: 'Address to delete'}, User.columns)
+            .then((updatedModel) => {
+                expect(updatedModel.get('address')).toBe('Address to delete');
+                done();
+            })
+            .catch((err) => {
+                expect(err).toBe("NOT_FOUND");
+                done();
+            });
+    });
+
     it('should update an entry by id', (done) => {
         User
             .getList({ email: 'emailtest@user2.com', limit: 1 }, User.columns)
