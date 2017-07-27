@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Wirnex/bookshelf-modelbase-plus.git"
+    "url": "git+https://github.com/betastreet/bookshelf-modelbase-plus.git"
   },
   "keywords": [
     "bookshelf",
@@ -22,9 +22,9 @@
   "author": "Igor Pletenev",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Wirnex/bookshelf-modelbase-plus/issues"
+    "url": "https://github.com/betastreet/bookshelf-modelbase-plus/issues"
   },
-  "homepage": "https://github.com/Wirnex/bookshelf-modelbase-plus#readme",
+  "homepage": "https://github.com/betastreet/bookshelf-modelbase-plus#readme",
   "devDependencies": {
     "bookshelf-paranoia": "^0.9.0",
     "eslint": "^3.12.0",
