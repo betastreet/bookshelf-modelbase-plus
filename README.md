@@ -160,8 +160,8 @@ npm i --save bookshelf-modelbase-plus
 
 ###### Import Events
 ```js
-Model.on('import.created', function(createdModel) {...});
-Model.on('import.updated', function(updatedModel, prevModel) {...});
+Model.eventEmitter.on('import.created', function(createdModel) {...});
+Model.eventEmitter.on('import.updated', function(updatedModel, prevModel) {...});
 ```
 
 ### model.destroyMany
