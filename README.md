@@ -1,6 +1,6 @@
 # bookshelf-modelbase-plus
 [![Version](https://badge.fury.io/js/bookshelf-modelbase-plus.svg)](http://badge.fury.io/js/bookshelf-modelbase-plus)
-[![Build Status](https://travis-ci.org/betastreet/bookshelf-modelbase-plus.svg?branch=master)](https://travis-ci.org/Wirnex/bookshelf-modelbase-plus)
+[![Build Status](https://travis-ci.org/betastreet/bookshelf-modelbase-plus.svg?branch=master)](https://travis-ci.org/betastreet/bookshelf-modelbase-plus)
 
 ## Why
 [Bookshelf modelbase](https://github.com/bsiddiqui/bookshelf-modelbase) plugin offers good functionality, however when dealing with a number of similar REST microservices
