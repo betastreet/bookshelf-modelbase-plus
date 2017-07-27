@@ -1,2 +1,5 @@
 .idea
 node_modules
+/test/db/db.sqlite
+/test/db/db.sqlite-journal
+/npm-*.log
