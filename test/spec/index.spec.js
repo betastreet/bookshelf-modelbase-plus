@@ -5,6 +5,14 @@ jest.disableAutomock();
 const bookshelf = require('../db').bookshelf;
 const User = require('../db/models/user');
 
+User.eventEmitter.on('import.created', function(createdModel) {
+    console.log('import.created fired: ', JSON.stringify(createdModel));
+});
+
+User.eventEmitter.on('import.updated', function(updatedModel, prevModel) {
+    console.log('import.updated fired: ', JSON.stringify(updatedModel), JSON.stringify(prevModel));
+});
+
 describe('database querying', () => {
 
     beforeAll((done) => {
