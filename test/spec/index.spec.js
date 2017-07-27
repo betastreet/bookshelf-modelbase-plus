@@ -10,7 +10,7 @@ User.eventEmitter.on('import.created', function(createdModel) {
 });
 
 User.eventEmitter.on('import.updated', function(updatedModel, prevModel) {
-    console.log('import.updated fired: ', JSON.stringify(updatedModel, prevModel));
+    console.log('import.updated fired: ', JSON.stringify(updatedModel), JSON.stringify(prevModel));
 });
 
 describe('database querying', () => {
