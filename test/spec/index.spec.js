@@ -1,4 +1,10 @@
-'use strict'
+'use strict';
+
+/* global jest */
+/* global describe */
+/* global beforeAll */
+/* global it */
+/* global expect */
 
 jest.disableAutomock();
 
@@ -168,6 +174,19 @@ describe('database querying', () => {
             })
             .catch((err) => {
                 expect(1).toBe(err);
+                done();
+            });
+    });
+
+    it('should reject with NOT_FOUND error when deleting a nonexistent entry by composite key', (done) => {
+        User
+            .destroyOneByCompositePKey({ email: 'unknown-emailtest@user0.com'})
+            .then(() => {
+                expect(true).toBeFalsy();
+                done();
+            })
+            .catch((err) => {
+                expect(err).toBe('NOT_FOUND');
                 done();
             });
     });
