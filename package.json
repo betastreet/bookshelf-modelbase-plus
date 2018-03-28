@@ -1,6 +1,6 @@
 {
   "name": "bookshelf-modelbase-plus",
-  "version": "2.2.3",
+  "version": "2.3.0",
   "description": "Extended functionality for REST operations with validation, filtering, ordering, importing records.",
   "main": "./lib",
   "scripts": {
@@ -30,7 +30,8 @@
     "eslint": "^3.12.0",
     "eslint-config-airbnb-base": "^11.0.0",
     "eslint-plugin-import": "^2.2.0",
-    "jest": "^17.0.3",
+    "bookshelf-prefixed-ordered-uuid": "^2.x",
+    "jest": "^22.4.3",
     "knex": ">=0.6.10 <0.12.0",
     "sqlite": "^2.2.4",
     "sqlite3": "^3.1.8",

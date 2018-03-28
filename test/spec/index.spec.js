@@ -10,6 +10,7 @@ jest.disableAutomock();
 
 const bookshelf = require('../db').bookshelf;
 const User = require('../db/models/user');
+const Budget = require('../db/models/budget');
 
 User.eventEmitter.on('import.created', function(createdModel) {
     console.log('import.created fired: ', JSON.stringify(createdModel));
@@ -202,5 +203,47 @@ describe('database querying', () => {
                 expect(1).toBe(err);
                 done();
             });
+    });
+
+    describe('bulk operations', () => {
+
+        beforeAll(() => Budget.bulkDestroy({ /* remove all */ }));
+        const data = [{
+            type: 'daily',
+            external_id: 'EX11e7e55461949330ae6cf929028983d1',
+            budget: 100,
+        }, {
+            type: 'monthly',
+            external_id: 'EX11e7e55461949330ae6cf929028983d1',
+            budget: 200,
+        }];
+
+        it('should do bulk insertion and return inserted records', () => {
+            return Budget.bulkInsert(data, { returnInserted: true })
+            .then((models) => {
+                expect(models).toMatchObject([{
+                    type: 'daily',
+                    external_id: 'EX11e7e55461949330ae6cf929028983d1',
+                    budget: 100,
+                }, {
+                    type: 'monthly',
+                    external_id: 'EX11e7e55461949330ae6cf929028983d1',
+                    budget: 200,
+                }]);
+            })
+            .catch(e => console.log(e));
+        });
+
+        it('should do many bulk operations in transaction', () =>
+            expect(bookshelf.knex.transaction(t =>
+                Budget.bulkDestroy({
+                    external_id: bookshelf.Model.prefixedUuidToBinary('EX11e7e55461949330ae6cf929028983d1', 2)
+                }, {transacting: t})
+                .then(() => Promise.reject(new Error('whoops')))
+                .then(() => Budget.bulkInsert(data, {transacting: t, returnInserted: true}))
+                .then(t.commit)
+                .catch(t.rollback)
+            )).rejects.toThrow('whoops')
+        );
     });
 });
