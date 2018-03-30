@@ -1,6 +1,6 @@
 {
   "name": "bookshelf-modelbase-plus",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "description": "Extended functionality for REST operations with validation, filtering, ordering, importing records.",
   "main": "./lib",
   "scripts": {
@@ -33,6 +33,7 @@
     "bookshelf-prefixed-ordered-uuid": "^2.x",
     "jest": "^22.4.3",
     "knex": ">=0.6.10 <0.12.0",
+    "mock-knex": "^0.4.0",
     "sqlite": "^2.2.4",
     "sqlite3": "^3.1.8",
     "bookshelf": ">=0.0.0 <1.0.0"

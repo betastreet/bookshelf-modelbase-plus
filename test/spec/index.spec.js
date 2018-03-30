@@ -8,6 +8,9 @@
 
 jest.disableAutomock();
 
+const mockDb = require('mock-knex');
+const tracker = require('mock-knex').getTracker();
+
 const bookshelf = require('../db').bookshelf;
 const User = require('../db/models/user');
 const Budget = require('../db/models/budget');
@@ -224,10 +227,6 @@ describe('database querying', () => {
             }])
         );
 
-        // it('should do bulk insertion and return inserted records', () => {
-        //     return Budget.bulkInsert(data, {returnInserted: true})
-        // });
-
         it('should do many bulk operations in transaction', () =>
             expect(bookshelf.knex.transaction(t =>
                 Budget.bulkDestroy({
@@ -239,5 +238,38 @@ describe('database querying', () => {
                 .catch(t.rollback)
             )).rejects.toThrow('whoops')
         );
+
+        it('should do bulk updating', () => {
+            const budgets = [
+                { id: 'BU11e71949330aee55466cf929028983d1', type: 'daily', budget: 100 },
+                { id: 'BU11e7194ee56cf92902899546330a83d1', type: 'monthly', budget: 200 },
+                { type: 'weekly', budget: 300 }
+            ]
+            mockDb.mock(bookshelf.knex);
+            tracker.install();
+
+            tracker.on('query', function checkResult(query, num) {
+                console.log(query, num);
+                switch(num) {
+                    case 1:
+                        return query.response(budgets);
+                    case 2:
+                        return query.response(budgets);
+                    case 3:
+                        expect(query.sql).toMatch('on duplicate key update id=values(id),type=values(type),budget=values(budget)')
+                        return query.response(true);
+                }
+            });
+
+            return Budget
+            .fetchAll()
+            .tap(models => console.log(models.serialize()))
+            .then(models => {
+                const data = models.serialize();
+                data[0].budget = 120;
+                data[1].budget = 230;
+                return Budget.bulkUpdate(data)
+            });
+        });
     });
 });
