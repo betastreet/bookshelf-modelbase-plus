@@ -1,16 +1,19 @@
-'use strict';
-
 /* global jest */
 /* global describe */
 /* global beforeAll */
+/* global beforeEach */
 /* global it */
 /* global expect */
 
 jest.disableAutomock();
 
+const mockDb = require('mock-knex');
+const tracker = require('mock-knex').getTracker();
+
 const bookshelf = require('../db').bookshelf;
 const User = require('../db/models/user');
 const Budget = require('../db/models/budget');
+const _ = require('lodash');
 
 User.eventEmitter.on('import.created', function(createdModel) {
     console.log('import.created fired: ', JSON.stringify(createdModel));
@@ -199,45 +202,103 @@ describe('database querying', () => {
     });
 
     describe('bulk operations', () => {
-        beforeAll(() => Budget.bulkDestroy({ /* remove all */ }) );
+      beforeEach(() => Budget.bulkDestroy({ /* remove all */ }) );
 
-        const data = [{
-            type: 'daily',
-            external_id: 'EX11e7e55461949330ae6cf929028983d1',
-            budget: 100,
-        }, {
-            type: 'monthly',
-            external_id: 'EX11e7e55461949330ae6cf929028983d1',
-            budget: 200,
-        }];
+      const data = [
+        { type: 'daily', external_id: 'EX11e7e55461949330ae6cf929028983d1', budget: 100 },
+        { type: 'monthly', external_id: 'EX11e7e55461949330ae6cf929028983d1', budget: 200 },
+      ];
 
-        it('should do bulk insertion and return inserted records', () =>
-            expect(Budget.bulkInsert(data, { returnInserted: true }))
-            .resolves.toMatchObject([{
-                type: 'daily',
-                external_id: 'EX11e7e55461949330ae6cf929028983d1',
-                budget: 100,
-            }, {
-                type: 'monthly',
-                external_id: 'EX11e7e55461949330ae6cf929028983d1',
-                budget: 200,
-            }])
-        );
-
-        // it('should do bulk insertion and return inserted records', () => {
-        //     return Budget.bulkInsert(data, {returnInserted: true})
-        // });
-
-        it('should do many bulk operations in transaction', () =>
-            expect(bookshelf.knex.transaction(t =>
-                Budget.bulkDestroy({
-                    external_id: bookshelf.Model.prefixedUuidToBinary('EX11e7e55461949330ae6cf929028983d1', 2)
-                }, {transacting: t})
+      describe('transactions', () => {
+        it('should do many bulk operations in a transaction', async () => {
+          const err = await bookshelf.knex
+            .transaction(t => {
+              return Budget
+                .bulkDestroy(
+                  { external_id: bookshelf.Model.prefixedUuidToBinary('EX11e7e55461949330ae6cf929028983d1', 2) },
+                  { transacting: t }
+                )
                 .then(() => Promise.reject(new Error('whoops')))
                 .then(() => Budget.bulkInsert(data, {transacting: t, returnInserted: true}))
-                .then(t.commit)
-                .catch(t.rollback)
-            )).rejects.toThrow('whoops')
-        );
+            })
+            .catch(e => e);
+          expect(err.message).toBe('whoops');
+        });
+      });
+
+      describe('bulkInsert()', () => {
+        it('should do bulk insertion', async () => {
+          await Budget.bulkInsert(_.cloneDeep(data));
+          const inserted = (await new Budget().fetchAll()).serialize();
+          expect(inserted).toMatchObject([
+            { type: 'daily', external_id: 'EX11e7e55461949330ae6cf929028983d1', budget: 100 },
+            { type: 'monthly', external_id: 'EX11e7e55461949330ae6cf929028983d1', budget: 200 },
+          ]);
+        });
+
+        it('should return a number of inserted rows', async () => {
+          const insertedCount = await Budget.bulkInsert(_.cloneDeep(data));
+          expect(insertedCount).toBe(2);
+        });
+
+        it('should return inserted records as objects in an array', async () => {
+          const inserted = await Budget.bulkInsert(_.cloneDeep(data), { returnInserted: true });
+          expect(inserted).toMatchObject([
+            { type: 'daily', external_id: 'EX11e7e55461949330ae6cf929028983d1', budget: 100 },
+            { type: 'monthly', external_id: 'EX11e7e55461949330ae6cf929028983d1', budget: 200 },
+          ]);
+        });
+      });
+
+      describe('bulkDestroy()', () => {
+        it('should destroy multiple rows', async () => {
+          await Budget.bulkInsert(_.cloneDeep(data));
+          const inserted = (await new Budget().fetchAll()).serialize();
+          // an intermediate check that records have been created
+          expect(inserted).toMatchObject([
+            { type: 'daily', external_id: 'EX11e7e55461949330ae6cf929028983d1', budget: 100 },
+            { type: 'monthly', external_id: 'EX11e7e55461949330ae6cf929028983d1', budget: 200 },
+          ]);
+          await Budget.bulkDestroy({ external_id: 'EX11e7e55461949330ae6cf929028983d1' });
+          const destroyed = (await new Budget().fetchAll()).serialize();
+          expect(destroyed).toMatchObject([]);
+        });
+      });
+
+      describe('bulkUpdate()', () => {
+        it('should do bulk updating', () => {
+          const budgets = [
+            { id: 'BU11e71949330aee55466cf929028983d1', type: 'daily', budget: 100 },
+            { id: 'BU11e7194ee56cf92902899546330a83d1', type: 'monthly', budget: 200 },
+            { type: 'weekly', budget: 300 },
+          ];
+          mockDb.mock(bookshelf.knex);
+          tracker.install();
+
+          tracker.on('query', function checkResult(query, num) {
+            // console.log(query, num);
+            switch(num) {
+              case 1:
+                return query.response(budgets);
+              case 2:
+                return query.response(budgets);
+              case 3:
+                expect(query.sql).toMatch('on duplicate key update id=values(id),type=values(type),budget=values(budget)');
+                return query.response(true);
+            }
+          });
+
+          return Budget
+            .fetchAll()
+            // .tap(models => console.log(models.serialize()))
+            .then(models => {
+              const data = models.serialize();
+              data[0].budget = 120;
+              data[1].budget = 230;
+              return data;
+            })
+            .then(data => Budget.bulkUpdate(data));
+        });
+      });
     });
 });
