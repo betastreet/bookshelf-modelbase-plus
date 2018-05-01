@@ -43,7 +43,7 @@
       "node": true,
       "es6": true
     },
-    "extents": "airbnb-base",
+    "extends": "airbnb-base",
     "sourceType": "module"
   },
   "dependencies": {
