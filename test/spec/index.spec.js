@@ -209,6 +209,23 @@ describe('database querying', () => {
         { type: 'monthly', external_id: 'EX11e7e55461949330ae6cf929028983d1', budget: 200 },
       ];
 
+      describe('transactions', () => {
+        it('should do many bulk operations in a transaction', async () => {
+          const err = await bookshelf.knex
+            .transaction(t => {
+              return Budget
+                .bulkDestroy(
+                  { external_id: bookshelf.Model.prefixedUuidToBinary('EX11e7e55461949330ae6cf929028983d1', 2) },
+                  { transacting: t }
+                )
+                .then(() => Promise.reject(new Error('whoops')))
+                .then(() => Budget.bulkInsert(data, {transacting: t, returnInserted: true}))
+            })
+            .catch(e => e);
+          expect(err.message).toBe('whoops');
+        });
+      });
+
       describe('bulkInsert()', () => {
         it('should do bulk insertion', async () => {
           await Budget.bulkInsert(_.cloneDeep(data));
@@ -281,23 +298,6 @@ describe('database querying', () => {
               return data;
             })
             .then(data => Budget.bulkUpdate(data));
-        });
-      });
-
-      describe('transactions', () => {
-        it('should do many bulk operations in a transaction', async () => {
-          const err = await bookshelf.knex
-            .transaction(t => {
-              return Budget
-                .bulkDestroy(
-                  { external_id: bookshelf.Model.prefixedUuidToBinary('EX11e7e55461949330ae6cf929028983d1', 2) },
-                  { transacting: t }
-                )
-                .then(() => Promise.reject(new Error('whoops')))
-                .then(() => Budget.bulkInsert(data, {transacting: t, returnInserted: true}))
-            })
-            .catch(e => e);
-          expect(err.message).toBe('whoops');
         });
       });
     });
