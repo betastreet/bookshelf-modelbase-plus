@@ -284,25 +284,21 @@ describe('database querying', () => {
         });
       });
 
-      // TODO:
-      // describe('transactions', () => {
-      //   // (!) SQLite doesn't support transactions
-      //   it('should do many bulk operations in transaction', async () => {
-      //     const err = await bookshelf.knex
-      //       .transaction(t => {
-      //         return Budget
-      //           .bulkDestroy(
-      //             { external_id: bookshelf.Model.prefixedUuidToBinary('EX11e7e55461949330ae6cf929028983d1', 2) },
-      //             { transacting: t }
-      //           )
-      //           .then(() => Promise.reject(new Error('whoops')))
-      //           .then(() => Budget.bulkInsert(data, {transacting: t, returnInserted: true}))
-      //           .then(t.commit)
-      //           .catch(t.rollback)
-      //       })
-      //       .catch(e => e);
-      //     expect(err.message).toBe('whoops');
-      //   });
-      // });
+      describe('transactions', () => {
+        it('should do many bulk operations in a transaction', async () => {
+          const err = await bookshelf.knex
+            .transaction(t => {
+              return Budget
+                .bulkDestroy(
+                  { external_id: bookshelf.Model.prefixedUuidToBinary('EX11e7e55461949330ae6cf929028983d1', 2) },
+                  { transacting: t }
+                )
+                .then(() => Promise.reject(new Error('whoops')))
+                .then(() => Budget.bulkInsert(data, {transacting: t, returnInserted: true}))
+            })
+            .catch(e => e);
+          expect(err.message).toBe('whoops');
+        });
+      });
     });
 });
