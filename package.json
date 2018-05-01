@@ -47,6 +47,7 @@
     "sourceType": "module"
   },
   "dependencies": {
+    "bluebird": "^3.5.1",
     "bookshelf-modelbase": "^2.10.2",
     "lodash": "^4.17.4"
   }
