@@ -259,19 +259,30 @@ describe('database querying', () => {
         it('should do bulk update', async () => {
           await Budget.bulkInsert(_.cloneDeep(data));
           const existing = await new Budget().fetchAll();
-          console.log('instanceof', existing instanceof (new Budget()).Collection);
           const updates = existing.serialize();
           updates[0].budget = 101;
           updates[1].external_id = 'EX11e7e55461949330ae6cf929028983d2';
+
+          mockDb.mock(bookshelf.knex);
+          tracker.install();
+          tracker.on('query', function checkResult(query, num) {
+            // console.log(query, num);
+            switch(num) {
+              case 1:
+              case 2:
+              case 3: return query.response(updates);
+              case 4: return query.response(true);
+            }
+          });
+
           const sync = await Budget.bulkSync(existing, updates, Budget.columns);
+          mockDb.unmock(bookshelf.knex);
           expect(sync).toEqual({
             inserted: [],
             updated: updates,
             destroyed: [],
             unchanged: [],
           });
-          const rows = (await new Budget().fetchAll()).serialize();
-          expect(rows).toMatchObject(updates);
         });
       });
 
@@ -315,14 +326,18 @@ describe('database querying', () => {
       });
 
       describe('bulkUpdate()', () => {
+        beforeAll(() => {
+          mockDb.mock(bookshelf.knex);
+          tracker.install();
+        });
+        afterAll(() => mockDb.unmock(bookshelf.knex));
+
         it('should do bulk updating', () => {
           const budgets = [
             { id: 'BU11e71949330aee55466cf929028983d1', type: 'daily', budget: 100 },
             { id: 'BU11e7194ee56cf92902899546330a83d1', type: 'monthly', budget: 200 },
             { type: 'weekly', budget: 300 },
           ];
-          mockDb.mock(bookshelf.knex);
-          tracker.install();
 
           tracker.on('query', function checkResult(query, num) {
             // console.log(query, num);
