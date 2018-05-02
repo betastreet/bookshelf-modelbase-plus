@@ -277,12 +277,12 @@ describe('database querying', () => {
 
           const sync = await Budget.bulkSync(existing, updates, Budget.columns);
           mockDb.unmock(bookshelf.knex);
-          expect(sync).toEqual({
+          expect(JSON.stringify(sync)).toEqual(JSON.stringify({
             inserted: [],
             updated: updates,
             destroyed: [],
             unchanged: [],
-          });
+          }));
         });
       });
 
