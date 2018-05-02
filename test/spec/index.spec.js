@@ -60,7 +60,6 @@ describe('database querying', () => {
                 });
         });
 
-
         it('should import set of records', (done) => {
             let users = [
                 {
@@ -168,7 +167,6 @@ describe('database querying', () => {
                     done();
                 });
         });
-
 
         it('should destroy an entry by composite key', (done) => {
             User
