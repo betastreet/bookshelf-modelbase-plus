@@ -228,14 +228,29 @@ describe('database querying', () => {
         it('should do bulk insert', async () => {
           const existing = await new Budget().fetchAll();
           const sync = await Budget.bulkSync(existing, _.cloneDeep(data), Budget.columns);
-          const inserted = (await new Budget().fetchAll()).serialize();
-          expect(inserted).toMatchObject(_.cloneDeep(data));
-          expect(sync).toEqual({
-            inserts: _.cloneDeep(data),
-            updates: [],
-            destroys: [],
+          expect(sync).toMatchObject({
+            inserted: data,
+            updated: [],
+            destroyed: [],
             unchanged: [],
           });
+          const rows = (await new Budget().fetchAll()).serialize();
+          expect(rows).toMatchObject(data);
+        });
+
+        it('should do bulk destroy', async () => {
+          await Budget.bulkInsert(_.cloneDeep(data));
+          const existing = await new Budget().fetchAll();
+          const existingRaw = existing.serialize();
+          const sync = await Budget.bulkSync(existing.clone(), [existingRaw[0]], Budget.columns);
+          expect(sync).toEqual({
+            inserted: [],
+            updated: [],
+            destroyed: [existingRaw[1]],
+            unchanged: [existingRaw[0]],
+          });
+          const rows = (await new Budget().fetchAll()).serialize();
+          expect(rows).toMatchObject([existingRaw[0]]);
         });
       });
 
