@@ -202,10 +202,13 @@ describe('database querying', () => {
     describe('bulk operations', () => {
       beforeEach(() => Budget.bulkDestroy({ /* remove all */ }) );
 
-      const data = [
-        { type: 'daily', external_id: 'EX11e7e55461949330ae6cf929028983d1', budget: 100 },
-        { type: 'monthly', external_id: 'EX11e7e55461949330ae6cf929028983d1', budget: 200 },
-      ];
+      let data;
+      beforeEach(() => {
+        data = [
+          { type: 'daily', external_id: 'EX11e7e55461949330ae6cf929028983d1', budget: 100 },
+          { type: 'monthly', external_id: 'EX11e7e55461949330ae6cf929028983d1', budget: 200 },
+        ];
+      });
 
       describe('transactions', () => {
         it('should do many bulk operations in a transaction', async () => {
@@ -242,7 +245,7 @@ describe('database querying', () => {
           await Budget.bulkInsert(_.cloneDeep(data));
           const existing = await new Budget().fetchAll();
           const existingRaw = existing.serialize();
-          const sync = await Budget.bulkSync(existing.clone(), [existingRaw[0]], Budget.columns);
+          const sync = await Budget.bulkSync(existing, [existingRaw[0]], Budget.columns);
           expect(sync).toEqual({
             inserted: [],
             updated: [],
@@ -251,6 +254,24 @@ describe('database querying', () => {
           });
           const rows = (await new Budget().fetchAll()).serialize();
           expect(rows).toMatchObject([existingRaw[0]]);
+        });
+
+        it('should do bulk update', async () => {
+          await Budget.bulkInsert(_.cloneDeep(data));
+          const existing = await new Budget().fetchAll();
+          console.log('instanceof', existing instanceof (new Budget()).Collection);
+          const updates = existing.serialize();
+          updates[0].budget = 101;
+          updates[1].external_id = 'EX11e7e55461949330ae6cf929028983d2';
+          const sync = await Budget.bulkSync(existing, updates, Budget.columns);
+          expect(sync).toEqual({
+            inserted: [],
+            updated: updates,
+            destroyed: [],
+            unchanged: [],
+          });
+          const rows = (await new Budget().fetchAll()).serialize();
+          expect(rows).toMatchObject(updates);
         });
       });
 
