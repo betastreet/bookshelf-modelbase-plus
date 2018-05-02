@@ -226,6 +226,21 @@ describe('database querying', () => {
         });
       });
 
+      describe('bulkSync()', () => {
+        it('should do bulk insert', async () => {
+          const existing = await new Budget().fetchAll();
+          const sync = await Budget.bulkSync(existing, _.cloneDeep(data), Budget.columns);
+          const inserted = (await new Budget().fetchAll()).serialize();
+          expect(inserted).toMatchObject(_.cloneDeep(data));
+          expect(sync).toEqual({
+            inserts: _.cloneDeep(data),
+            updates: [],
+            destroys: [],
+            unchanged: [],
+          });
+        });
+      });
+
       describe('bulkInsert()', () => {
         it('should do bulk insertion', async () => {
           await Budget.bulkInsert(_.cloneDeep(data));
