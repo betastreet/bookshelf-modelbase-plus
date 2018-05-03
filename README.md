@@ -176,3 +176,45 @@ Model.eventEmitter.on('import.updated', function(updatedModel, prevModel) {...})
             //
         });
 ```
+
+### model.bulkSync
+```js
+    /**
+     * Synchronizes an existing collection to a desired collection
+     * @param {Array<*>} existing Collection (or array)
+     * @param {Array<*>} desired collection
+     * @param {Array<string>} columns to update
+     * @param options.noInsert - prevents inserting new records (default inserts)
+     * @param options.noUpdate - prevents updating existing records (default updates)
+     * @param options.noDestroy - prevents destroying existing records (default destroys)
+     * @param options.isMatch - comparison function called with existing row and desired row. Default: (a,b) => a.id === b.id
+     * @return Promise<*>
+     *   {Array<*>} inserted
+     *   {Array<*>} updated (models with getSavedAttributes accessible)
+     *   {Array<*>} destroyed
+     *   {Array<*>} unchanged
+     */
+  const isMatch = (a, b) => (a.id && a.id === b.id) || (a.type === b.type);
+
+  Budget
+    .fetchAll()
+    .then(existing => Budget.bulkSync(existing, data, Budget.columns, { isMatch }))
+    .then((synced) => {
+      synced.inserted.forEach(i => events.emit('exchangeCreated', i, req));
+      synced.updated.forEach(i => events.emit('exchangeUpdated', i, req));
+      synced.destroyed.forEach(i => events.emit('exchangeDestroyed', i, req));
+    });
+```
+
+### model.bulkDestroyIn
+```js
+    /**
+     * Destroys all matching models by ID
+     * @param {Array<*>} array of models with IDs to destroy
+     * @param options.transacting
+     * @return Promise<number> number of rows deleted
+     */
+  Budget
+    .bulkDestroyIn({id: 1}, {id: 2})
+    .then(rows => console.log(`deleted ${rows}`));
+```
