@@ -51,13 +51,57 @@ npm i --save bookshelf-modelbase-plus
         })
         .catch(function(err) { });
 ```
+#### Complex Queries:
+- Supports Arrays for key operator/value, like
+```js
+  Budget.getList(status: ['=', 'enabled'], ['status'])
+```
+- Supports Objects, like:
+```js
+  Budget.getList({
+    status: {
+      operator: 'LIKE',
+      value: '%enabled%',
+    }}).then(models => {});
+```
+- Supports array values, like:
+```js
+  Budget.getList(status: ['IN', ['enabled', 'disabled']], ['status'])
+```
+- Supports or/and nesting, like:
+```js
+  Budget.getList({name: 'name0', _or: {name: 'name1', _and: {status: 'enabled'}}}, ['name', 'status'])
+```
+
+#### Supported Operators
+- \!=
+- NOT_EQUAL_TO
+- \<
+- LESS_THAN
+- \<
+- LESS_THAN_OR_EQUAL_TO
+- \>
+- GREATER_THAN
+- \>
+- GREATER_THAN_OR_EQUAL_TO
+- \=
+- EQUAL_TO
+- LIKE
+- NOT_LIKE
+- NOT
+- BETWEEN
+- NOT_BETWEEN
+- NOT
+- IN
+- NOT_IN
+- NOT
 
 ### model.createOne
 ```js
 /**
-     * Create and save model and return all attributes 
+     * Create and save model and return all attributes
      * @param {Object} data
-     * @param {Array} columns The set of columns will be used to fetch attribute values from the *data* object 
+     * @param {Array} columns The set of columns will be used to fetch attribute values from the *data* object
      * @return {Promise(bookshelf.Model)} Bookshelf Collection of all Models
      */
     Budget
@@ -66,7 +110,7 @@ npm i --save bookshelf-modelbase-plus
             //
         })
         .catch((err) => {
-            
+
         });
 ```
 
@@ -106,7 +150,7 @@ npm i --save bookshelf-modelbase-plus
 ### model.destroyOneByCompositePKey
 ```js
     /**
-     * Destroys  model through composite pKEY lookup 
+     * Destroys  model through composite pKEY lookup
      * @param {Object} options should have the composite key fields
      */
     Budget
@@ -167,7 +211,7 @@ Model.eventEmitter.on('import.updated', function(updatedModel, prevModel) {...})
 ### model.destroyMany
 ```js
     /**
-     * Destroys a set of model through where condition 
+     * Destroys a set of model through where condition
      * @param {Object} options.where should have the where condtions for destroy
      */
     Budget

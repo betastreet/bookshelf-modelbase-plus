@@ -16,29 +16,28 @@ const Budget = require('../db/models/budget');
 const _ = require('lodash');
 
 User.eventEmitter.on('import.created', function(createdModel) {
-    console.log('import.created fired: ', JSON.stringify(createdModel));
+    // console.log('import.created fired: ', JSON.stringify(createdModel));
 });
 
 User.eventEmitter.on('import.updated', function(updatedModel, prevModel) {
-    console.log('import.updated fired: ', JSON.stringify(updatedModel), JSON.stringify(prevModel));
+    // console.log('import.updated fired: ', JSON.stringify(updatedModel), JSON.stringify(prevModel));
 });
+
+Array.prototype.it = function (description, testCaseFunction) {
+  this.forEach((innerArray) => {
+    it(description + ' ' + JSON.stringify(innerArray), () => {
+      return testCaseFunction.apply(this, innerArray);
+    });
+  });
+};
 
 describe('database querying', () => {
 
     describe('base operations', () => {
-        beforeAll((done) => {
-            // making sure test data is removed, afterAll will not trigger in case
-            // of test faliures
-            bookshelf.knex('users').whereIn('email', [
-                'emailtest@user0.com',
-                'emailtest@user1.com',
-                'emailtest@user2.com',
-                'emailtest@user3.com',
-            ])
-                .del()
-                .then(() => {
-                    done();
-                });
+        beforeEach(() => {
+            return bookshelf.knex('users')
+                .where('email', 'like', 'emailtest%')
+                .del();
         });
 
         let id = null;
@@ -94,25 +93,18 @@ describe('database querying', () => {
                 });
         });
 
-        it('should get list of a records', (done) => {
-            User
+        it('should get list of a records', () => {
+            return User
                 .getList({}, User.columns)
-                .then((models) => {
-                    expect(models.length).toBe(7);
-                    done();
-                })
-                .catch((err) => {
-                    expect(1).toBe(err);
-                    done();
-                });
+                .then(models => expect(models.length).toBe(3));
         });
 
         it('should get filtered list of a records', (done) => {
             User
-                .getList({ email: 'emailtest@user1.com', limit: 1 }, User.columns)
+                .getList({ email: 'email@user1.com', limit: 1 }, User.columns)
                 .then((models) => {
                     expect(models.length).toBe(1);
-                    expect(models.at(0).get('first_name')).toBe('First Name User 1 Test');
+                    expect(models.at(0).get('first_name')).toBe('First Name User 1');
                     done();
                 })
                 .catch((err) => {
@@ -121,82 +113,164 @@ describe('database querying', () => {
                 });
         });
 
-        it('should update an entry by composite pKey', (done) => {
-            User
-                .updateOneByCompositePKey({ email: 'emailtest@user1.com', address: 'Address to delete'}, User.columns)
-                .then((updatedModel) => {
-                    expect(updatedModel.get('address')).toBe('Address to delete');
-                    done();
-                })
-                .catch((err) => {
-                    expect(1).toBe(err);
-                    done();
-                });
+        describe('complex filters', () => {
+          const mapToEmailNum = u => parseInt(u.email.replace('email@user', '').replace('.com', ''));
+          const userGetExp = (q, exp) => User.getList(q, User.columns)
+            .then(models => expect(models
+              .serialize()
+              .map(u => mapToEmailNum(u)))
+              .toEqual(exp));
+
+          [
+            ['email', '!=', 'email@user0.com', [1, 2]],
+            ['email', 'NOT_EQUAL_TO', 'email@user0.com', [1, 2]],
+            ['balance', '<', 101, [1]],
+            ['balance', '<', 100, []],
+            ['balance', 'LESS_THAN', 101, [1]],
+            ['balance', 'LESS_THAN', 100, []],
+            ['balance', '<=', 100, [1]],
+            ['balance', '<=', 99, []],
+            ['balance', 'LESS_THAN_OR_EQUAL_TO', 100, [1]],
+            ['balance', 'LESS_THAN_OR_EQUAL_TO', 99, []],
+            ['balance', '>', 99, [1]],
+            ['balance', '>', 100, []],
+            ['balance', 'GREATER_THAN', 99, [1]],
+            ['balance', 'GREATER_THAN', 100, []],
+            ['balance', '>=', 100, [1]],
+            ['balance', '>=', 101, []],
+            ['balance', 'GREATER_THAN_OR_EQUAL_TO', 100, [1]],
+            ['balance', 'GREATER_THAN_OR_EQUAL_TO', 101, []],
+            ['balance', '=', 100, [1]],
+            ['balance', '=', 99, []],
+            ['balance', 'EQUAL_TO', 100, [1]],
+            ['balance', 'EQUAL_TO', 99, []],
+            ['email', 'EQUAL_TO', 'email@user0.com', [0]],
+            ['email', 'EQUAL_TO', 'email@u.com', []],
+            ['email', 'LIKE', 'email%.com', [0,1,2]],
+            ['email', 'LIKE', 'email@user0%', [0]],
+            ['email', 'NOT_LIKE', 'email%.com', []],
+            ['email', 'NOT_LIKE', 'email@user0%', [1, 2]],
+            ['balance', 'between', [99, 101], [1]],
+            ['balance', 'BETWEEN', [98, 99], []],
+            ['balance', 'NOT_BETWEEN', [99, 101], []],
+            ['balance', 'not_BETWEEN', [98, 99], [1]],
+            ['email', 'IN', ['email@user0.com', 'email@user1.com'], [0, 1]],
+            ['email', 'IN', ['email@.com'], []],
+            ['email', 'NOT_IN', ['email@user0.com', 'email@user1.com'], [2]],
+            ['email', 'NOT_IN', ['email@.com'], [0,1,2]],
+          ].
+          it('should filter operator', (key, operator, value, exp) => {
+            return userGetExp({[key]: {operator, value}}, exp);
+          });
+
+          it('should ignore unknown operators', () => {
+            return userGetExp({email: ['unknown', 'email@user0.com'], balance: 100}, [1]);
+          });
+
+          [
+            [['=', 100], [1]],
+            [['=', 101], []],
+            [['BETWEEN', [99, 200]], [1]],
+          ].
+          it('should filter with array instead of object', (balance, exp) => {
+            return userGetExp({balance}, exp);
+          });
+
+          [
+            [{email: 'email@user0.com', balance: ['=', 100]}, []],
+            [{email: 'email@user1.com', balance: ['=', 100]}, [1]],
+          ].
+          it('should mix regular and complex search', (query, exp) => {
+            return userGetExp(query, exp);
+          });
+
+          [
+            [{email: 'email@user0.com', _or: {email: 'email@user1.com'}}, [0, 1]],
+            [{email: 'email@.com', _or: {email: 'email@user1.com'}}, [1]],
+            [{email: 'email@user1.com', _and: {balance: ['!=', 100]}}, []],
+            [{email: 'email@user1.com', _and: {balance: ['=', 100]}}, [1]],
+            [{email: 'email@user0.com', _or: {email: 'email@user1.com', _and: {balance: 100}}}, [0, 1]],
+            [{email: 'email@user0.com', _or: {email: 'email@user1.com', _and: {balance: 101}}}, [0]],
+          ].
+          it('should support nested or/and', (query, exp) => {
+            return userGetExp(query, exp);
+          });
         });
 
-        it('should not update an entry by composite pKey when no corresponding record exists', (done) => {
-            User
-                .updateOneByCompositePKey({ email: 'emailtestNONEXISTING@user1.com', address: 'Address to delete'}, User.columns)
-                .then((updatedModel) => {
-                    expect(updatedModel.get('address')).toBe('Address to delete');
-                    done();
-                })
-                .catch((err) => {
-                    expect(err).toBe("NOT_FOUND");
-                    done();
-                });
-        });
+        describe('update', () => {
+          beforeEach(() => {
+            const users = [
+              {
+                first_name: 'First Name User 0 Test',
+                last_name: 'Last Name User 0 Test',
+                email: 'emailtest@user0.com',
+                address: 'Address Test 0',
+              },
+              {
+                first_name: 'First Name User 1 Test',
+                last_name: 'Last Name User 1 Test',
+                email: 'emailtest@user1.com',
+                balance: 100,
+              },
+              {
+                first_name: 'First Name User 2 Test',
+                last_name: 'Last Name User 2 Test',
+                email: 'emailtest@user2.com',
+                address: 'Address Test 2'
+              },
+            ];
+            return User.importMany(users, User.columns);
+          });
 
-        it('should update an entry by id', (done) => {
+          it('should update an entry by composite pKey', (done) => {
             User
-                .getList({ email: 'emailtest@user2.com', limit: 1 }, User.columns)
-                .then((models) => {
-                     User
-                        .updateOneById({ address: 'Address to delete' }, models.at(0).get('id'), User.columns)
-                        .then((updatedModel) => {
-                            expect(updatedModel.get('address')).toBe('Address to delete');
-                            done();
-                        })
-                        .catch((err) => {
-                            expect(1).toBe(err);
-                            done();
-                        });
-                })
-                .catch((err) => {
-                    expect(1).toBe(err);
-                    done();
-                });
-        });
+              .updateOneByCompositePKey({ email: 'emailtest@user1.com', address: 'Address to delete'}, User.columns)
+              .then((updatedModel) => {
+                expect(updatedModel.get('address')).toBe('Address to delete');
+                done();
+              })
+              .catch((err) => {
+                expect(1).toBe(err);
+                done();
+              });
+          });
 
-        it('should destroy an entry by composite key', (done) => {
+          it('should not update an entry by composite pKey when no corresponding record exists', () => {
+            return expect(User
+              .updateOneByCompositePKey({ email: 'emailtestNONEXISTING@user1.com', address: 'Address to delete'}, User.columns))
+              .rejects.toBe('NOT_FOUND');
+          });
+
+          it('should update an entry by id', () => {
+            return User
+              .getList({ email: 'emailtest@user2.com', limit: 1 }, User.columns)
+              .then(models => User.updateOneById({ address: 'Address to delete' }, models.at(0).get('id'), User.columns))
+              .then(updatedModel => expect(updatedModel.get('address')).toBe('Address to delete'));
+          });
+
+          it('should destroy an entry by composite key', () => {
+            return User
+              .destroyOneByCompositePKey({ email: 'emailtest@user0.com'})
+              .then(cnt => expect(cnt).toBe(1));
+          });
+
+          it('should reject with NOT_FOUND error when deleting a nonexistent entry by composite key', (done) => {
             User
-                .destroyOneByCompositePKey({ email: 'emailtest@user0.com'})
-                .then((cnt) => {
-                    expect(1).toBe(cnt);
-                    done();
-                })
-                .catch((err) => {
-                    expect(1).toBe(err);
-                    done();
-                });
-        });
+              .destroyOneByCompositePKey({ email: 'unknown-emailtest@user0.com'})
+              .then(() => {
+                expect(true).toBeFalsy();
+                done();
+              })
+              .catch((err) => {
+                expect(err).toBe('NOT_FOUND');
+                done();
+              });
+          });
 
-        it('should reject with NOT_FOUND error when deleting a nonexistent entry by composite key', (done) => {
-            User
-                .destroyOneByCompositePKey({ email: 'unknown-emailtest@user0.com'})
-                .then(() => {
-                    expect(true).toBeFalsy();
-                    done();
-                })
-                .catch((err) => {
-                    expect(err).toBe('NOT_FOUND');
-                    done();
-                });
+          it('should destroy many entries by where clause', () =>
+            expect(User.destroyMany({where: { address: 'Address Test 0'}})).resolves.toBe(1)
+          );
         });
-
-        it('should destroy many entries by where clause', () =>
-            expect(User.destroyMany({where: { address: 'Address to delete'}})).resolves.toBe(2)
-        );
     });
 
     describe('bulk operations', () => {
