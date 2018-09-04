@@ -185,6 +185,17 @@ describe('database querying', () => {
           });
 
           [
+            [{email: 'email@user0.com', balance: 100, _logic: 'and'}, []],
+            [{email: 'email@user0.com', balance: 100, _logic: 'UNKNOWN'}, []],
+            [{email: 'email@user0.com', balance: 100}, []],
+            [{email: 'email@user0.com', balance: 100, _logic: 'or' }, [0, 1]],
+            [{email: 'email@user0.com', balance: 100, address: 'Address 2', _logic: 'or' }, [0, 1, 2]],
+          ].
+          it('should support or/and logic', (query, exp) => {
+            return userGetExp(query, exp);
+          });
+
+          [
             [{email: 'email@user0.com', _or: {email: 'email@user1.com'}}, [0, 1]],
             [{email: 'email@.com', _or: {email: 'email@user1.com'}}, [1]],
             [{email: 'email@user1.com', _and: {balance: ['!=', 100]}}, []],
