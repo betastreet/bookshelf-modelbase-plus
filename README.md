@@ -56,6 +56,10 @@ npm i --save bookshelf-modelbase-plus
 ```js
   Budget.getList(status: ['=', 'enabled'], ['status'])
 ```
+- Supports specifying logic, like
+```js
+  Budget.getList({a: 2, b: 3, _logic: 'or'})
+```
 - Supports Objects, like:
 ```js
   Budget.getList({
