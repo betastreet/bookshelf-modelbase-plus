@@ -189,6 +189,8 @@ describe('database querying', () => {
             [{email: 'email@user0.com', balance: 100, _logic: 'UNKNOWN'}, []],
             [{email: 'email@user0.com', balance: 100}, []],
             [{email: 'email@user0.com', balance: 100, _logic: 'or' }, [0, 1]],
+            [{email: 'email@user0.com', balance: ['between', [98, 101]], _logic: 'or' }, [0, 1]],
+            [{email: 'email@user0.com', balance: ['between', [98, 101]], _logic: 'and' }, []],
             [{email: 'email@user0.com', balance: 100, address: 'Address 2', _logic: 'or' }, [0, 1, 2]],
           ].
           it('should support or/and logic', (query, exp) => {
