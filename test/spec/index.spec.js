@@ -113,6 +113,12 @@ describe('database querying', () => {
                 });
         });
 
+        it('should get by null', () => {
+          return User.getList({balance: null}, User.columns)
+            .then(models => models.serialize())
+            .then(users => expect(users).toHaveLength(2));
+        });
+
         describe('complex filters', () => {
           const mapToEmailNum = u => parseInt(u.email.replace('email@user', '').replace('.com', ''));
           const userGetExp = (q, exp) => User.getList(q, User.columns)
