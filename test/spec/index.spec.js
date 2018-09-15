@@ -169,6 +169,20 @@ describe('database querying', () => {
             return userGetExp({[key]: {operator, value}}, exp);
           });
 
+          [
+            ['balance', 'between', '99, 101', [1]],
+            ['balance', 'BETWEEN', '98,99', []],
+            ['balance', 'NOT_BETWEEN', '99, 101', []],
+            ['balance', 'not_BETWEEN', '98, 99', [1]],
+            ['email', 'IN', 'email@user0.com, , email@user1.com', [0, 1]],
+            ['email', 'IN', 'email@.com,  ', []],
+            ['email', 'NOT_IN', 'email@user0.com, email@user1.com', [2]],
+            ['email', 'NOT_IN', 'email@.com', [0,1,2]],
+          ].
+          it('should split comma values to an array', (key, operator, value, exp) => {
+            return userGetExp({[key]: {operator, value}}, exp);
+          });
+
           it('should ignore unknown operators', () => {
             return userGetExp({email: ['unknown', 'email@user0.com'], balance: 100}, [1]);
           });
