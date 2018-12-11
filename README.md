@@ -100,6 +100,24 @@ npm i --save bookshelf-modelbase-plus
 - NOT_IN
 - NOT
 
+#### Special queries
+A function may optionally be defined on the model to be used when
+specifying `withQuery` in the getList options, similar to `withRelated`.
+This function will then be called with the knex query builder so that
+the model can define custom code to refine the search
+(i.e. join, convert values, etc.)
+
+Example:
+```js
+    var Budget = ModelBase.extend({
+        tableName: 'budgets'
+        fancy: (qb, options) => {
+          return qb.where({name: options.name + options.name2});
+        },
+    });
+    Budget.getList({name: 'first', name2: 'last', withQuery: 'fancy'})
+```
+
 ### model.createOne
 ```js
 /**

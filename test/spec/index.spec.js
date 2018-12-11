@@ -228,6 +228,10 @@ describe('database querying', () => {
           it('should support nested or/and', (query, exp) => {
             return userGetExp(query, exp);
           });
+
+          it('should support special withQuery functions', () => {
+            return userGetExp({withQuery: 'firstName', fancy: 'First Name User 2'}, [2]);
+          });
         });
 
         describe('update', () => {
