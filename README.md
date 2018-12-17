@@ -75,6 +75,7 @@ npm i --save bookshelf-modelbase-plus
 - Supports or/and nesting, like:
 ```js
   Budget.getList({name: 'name0', _or: {name: 'name1', _and: {status: 'enabled'}}}, ['name', 'status'])
+  Budget.getList({name: 'name0', _or: [{name: 'name1'}, {status: 'enabled'}]}, ['name', 'status'])
 ```
 
 #### Supported Operators
