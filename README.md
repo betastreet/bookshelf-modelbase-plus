@@ -24,7 +24,8 @@ npm i --save bookshelf-modelbase-plus
     bookshelf.plugin('pagination');
 
     var Budget = ModelBase.extend({
-        tableName: 'budgets'
+        tableName: 'budgets',
+        validationOptions: {}, // Joi options (default options: { abortEarly: false })
     });
 ```
 
