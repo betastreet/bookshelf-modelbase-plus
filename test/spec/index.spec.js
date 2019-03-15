@@ -13,6 +13,7 @@ const tracker = require('mock-knex').getTracker();
 const bookshelf = require('../db').bookshelf;
 const User = require('../db/models/user');
 const Budget = require('../db/models/budget');
+const Category = require('../db/models/category');
 const _ = require('lodash');
 
 User.eventEmitter.on('import.created', function(createdModel) {
@@ -31,7 +32,7 @@ Array.prototype.it = function (description, testCaseFunction) {
   });
 };
 
-describe('database querying', () => {
+describe('bookshelf-model-base-plus', () => {
 
     describe('base operations', () => {
         beforeEach(() => {
@@ -476,6 +477,21 @@ describe('database querying', () => {
             })
             .then(data => Budget.bulkUpdate(data));
         });
+      });
+    });
+
+    describe('validation', () => {
+      const errMsg = `child "external_id" fails because ["external_id" is required]. child "name" fails because ["name" is required]`;
+
+      it('should return multiple validation errors when using validateSave() directly', async () => {
+        const model = new Category({});
+        const error = await Promise.resolve().then(() => model.validateSave(model, {}, {})).catch(e => e);
+        expect(error.message).toBe(errMsg);
+      });
+
+      it('should return multiple validation errors when using a CRUD method', async () => {
+        const error = await Promise.resolve().then(() => Category.createOne({}, ['external_id', 'name'])).catch(e => e);
+        expect(error.message).toBe(errMsg);
       });
     });
 });
