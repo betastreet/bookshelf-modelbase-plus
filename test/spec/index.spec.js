@@ -120,6 +120,12 @@ describe('bookshelf-model-base-plus', () => {
             .then(users => expect(users).toHaveLength(2));
         });
 
+        it('should be able to getAll with limit = -1', () => {
+          return User
+            .getList({limit: -1}, User.columns)
+            .then(models => expect(models.length).toBe(3));
+        });
+
         describe('complex filters', () => {
           const mapToEmailNum = u => parseInt(u.email.replace('email@user', '').replace('.com', ''));
           const userGetExp = (q, exp) => User.getList(q, User.columns)
