@@ -168,9 +168,15 @@ describe('bookshelf-model-base-plus', () => {
             ['balance', 'NOT_BETWEEN', [99, 101], []],
             ['balance', 'not_BETWEEN', [98, 99], [1]],
             ['email', 'IN', ['email@user0.com', 'email@user1.com'], [0, 1]],
+            ['email', 'IN', ['email@user0.com'], [0]],
             ['email', 'IN', ['email@.com'], []],
+            ['email', 'IN', [], []],
+            ['id', 'IN', [], []],
             ['email', 'NOT_IN', ['email@user0.com', 'email@user1.com'], [2]],
+            ['email', 'NOT_IN', ['email@user0.com'], [1, 2]],
             ['email', 'NOT_IN', ['email@.com'], [0,1,2]],
+            ['email', 'NOT_IN', [], [0,1,2]],
+            ['id', 'NOT_IN', [], [0,1,2]],
           ].
           it('should filter operator', (key, operator, value, exp) => {
             return userGetExp({[key]: {operator, value}}, exp);
