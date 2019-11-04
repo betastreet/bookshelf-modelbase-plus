@@ -92,15 +92,14 @@ npm i --save bookshelf-modelbase-plus
 - GREATER_THAN_OR_EQUAL_TO
 - \=
 - EQUAL_TO
+- IS
+- IS_NOT
 - LIKE
 - NOT_LIKE
-- NOT
 - BETWEEN
 - NOT_BETWEEN
-- NOT
 - IN
 - NOT_IN
-- NOT
 
 #### Special queries
 A function may optionally be defined on the model to be used when
