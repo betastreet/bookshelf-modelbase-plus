@@ -119,6 +119,13 @@ Example:
     Budget.getList({name: 'first', name2: 'last', withQuery: 'fancy'})
 ```
 
+Use the optional `select` param in the getList options to only return specific columns.
+The value should be a comma-separated string or an array of strings.
+
+Use the `getListQuery` method to get the underlying getList query without executing
+anything. This is useful in case you want to do something custom with the query,
+such as stream to a CSV somewhere instead of fetching a list of Bookshelf models.
+
 ### model.createOne
 ```js
 /**
