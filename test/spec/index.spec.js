@@ -116,14 +116,28 @@ describe('bookshelf-model-base-plus', () => {
 
         it('should get by null', () => {
           return User.getList({balance: null}, User.columns)
-            .then(models => models.serialize())
-            .then(users => expect(users).toHaveLength(2));
+            .then((users) => {
+              expect(users).toHaveLength(2);
+              expect(users.pagination).toBeDefined();
+            });
         });
 
         it('should be able to getAll with limit = -1', () => {
           return User
             .getList({limit: -1}, User.columns)
-            .then(models => expect(models.length).toBe(3));
+            .then((models) => {
+              expect(models.length).toBe(3);
+              expect(models.pagination).not.toBeDefined();
+            });
+        });
+
+        it('should be able to skip pagination with !paginate', () => {
+          return User
+            .getList({paginate: 0}, User.columns)
+            .then((models) => {
+              expect(models.length).toBe(3);
+              expect(models.pagination).not.toBeDefined();
+            });
         });
 
         describe('complex filters', () => {
