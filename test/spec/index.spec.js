@@ -140,6 +140,15 @@ describe('bookshelf-model-base-plus', () => {
             });
         });
 
+        it('should paginate', () => {
+          return User.getList({ limit: 1, page: 1 })
+            .then(models => expect(models.serialize()).toEqual([expect.objectContaining({ email: 'email@user0.com' })]))
+            .then(() => User.getList({ limit: 1, page: 2 }))
+            .then(models => expect(models.serialize()).toEqual([expect.objectContaining({ email: 'email@user1.com' })]))
+            .then(() => User.getList({ limit: 1, page: 3 }))
+            .then(models => expect(models.serialize()).toEqual([expect.objectContaining({ email: 'email@user2.com' })]));
+        });
+
         describe('complex filters', () => {
           const mapToEmailNum = u => parseInt(u.email.replace('email@user', '').replace('.com', ''));
           const userGetExp = (q, exp) => User.getList(q, User.columns)
