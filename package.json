@@ -1,6 +1,6 @@
 {
   "name": "bookshelf-modelbase-plus",
-  "version": "2.8.4",
+  "version": "2.8.5",
   "description": "Extended functionality for REST operations with validation, filtering, ordering, importing records.",
   "main": "./lib",
   "scripts": {
