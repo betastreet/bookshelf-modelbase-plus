@@ -529,4 +529,10 @@ describe('bookshelf-model-base-plus', () => {
         expect(error.message).toBe(errMsg);
       });
     });
+
+    describe('security', () => {
+      test('should treat query strings as strings not as js reserved words', async () => {
+        await User.getList({ first_name: 'constructor' }, User.columns);
+      });
+    });
 });
