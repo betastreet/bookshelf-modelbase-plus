@@ -532,7 +532,7 @@ describe('bookshelf-model-base-plus', () => {
 
     describe('security', () => {
       test('should treat query strings as strings not as js reserved words', async () => {
-        await User.getList({ first_name: 'constructor' }, User.columns);
+        await expect(User.getList({ first_name: 'constructor' }, User.columns)).resolves.toBeDefined();
       });
     });
 });
