@@ -100,6 +100,12 @@ npm i --save bookshelf-modelbase-plus
 - NOT_BETWEEN
 - IN
 - NOT_IN
+- MATCH
+- NOT_MATCH
+- MATCH_BOOL
+- NOT_MATCH_BOOL
+- MATCH_QUERY
+- NOT_MATCH_QUERY
 
 #### Special queries
 A function may optionally be defined on the model to be used when
