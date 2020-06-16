@@ -142,11 +142,20 @@ describe('bookshelf-model-base-plus', () => {
 
         it('should paginate', () => {
           return User.getList({ limit: 1, page: 1 })
-            .then(models => expect(models.serialize()).toEqual([expect.objectContaining({ email: 'email@user0.com' })]))
+            .then((models) => {
+              expect(models.serialize()).toEqual([expect.objectContaining({ email: 'email@user0.com' })]);
+              expect(models.pagination).toEqual({ page: 1, pageSize: 1, rowCount: 3, pageCount: 3 });
+            })
             .then(() => User.getList({ limit: 1, page: 2 }))
-            .then(models => expect(models.serialize()).toEqual([expect.objectContaining({ email: 'email@user1.com' })]))
+            .then((models) => {
+              expect(models.serialize()).toEqual([expect.objectContaining({ email: 'email@user1.com' })]);
+              expect(models.pagination).toEqual({ page: 2, pageSize: 1, rowCount: 3, pageCount: 3 });
+            })
             .then(() => User.getList({ limit: 1, page: 3 }))
-            .then(models => expect(models.serialize()).toEqual([expect.objectContaining({ email: 'email@user2.com' })]));
+            .then((models) => {
+              expect(models.serialize()).toEqual([expect.objectContaining({ email: 'email@user2.com' })]);
+              expect(models.pagination).toEqual({ page: 3, pageSize: 1, rowCount: 3, pageCount: 3 });
+            });
         });
 
         describe('complex filters', () => {
