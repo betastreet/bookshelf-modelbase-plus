@@ -28,7 +28,7 @@
   "devDependencies": {
     "bookshelf": "^1.2.0",
     "bookshelf-paranoia": "^0.13.1",
-    "bookshelf-prefixed-ordered-uuid": "^2.x",
+    "bookshelf-prefixed-ordered-uuid": "^2.1.0",
     "eslint": "^7.6.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.22.0",
