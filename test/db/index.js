@@ -7,7 +7,6 @@ let bookshelf = require('bookshelf')(knex);
 
 // Install all necessary plugins
 bookshelf.plugin(require('../../lib'));
-bookshelf.plugin('pagination');
 
 
 module.exports = {
