@@ -5,6 +5,7 @@
 /* global it */
 /* global expect */
 
+jest.setTimeout(3000);
 jest.disableAutomock();
 
 const mockDb = require('mock-knex');
