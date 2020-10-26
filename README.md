@@ -16,7 +16,7 @@ npm i --save bookshelf-modelbase-plus
 ```javascript
     var db        = require(knex)(require('./knexfile'));
     var bookshelf = require('bookshelf')(db);
-    var ModelBase = require('bookshelf-modelbase')(bookshelf);
+    var ModelBase = require('bookshelf-modelbase-plus')(bookshelf);
 
     // load plugin
     bookshelf.plugin(require('bookshelf-modelbase-plus'));

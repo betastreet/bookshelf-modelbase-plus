@@ -100,17 +100,12 @@ describe('bookshelf-model-base-plus', () => {
                 .then(models => expect(models.length).toBe(3));
         });
 
-        it('should get filtered list of a records', (done) => {
-            User
+        it('should get filtered list of a records', () => {
+            return User
                 .getList({ email: 'email@user1.com', limit: 1 }, User.columns)
                 .then((models) => {
                     expect(models.length).toBe(1);
                     expect(models.at(0).get('first_name')).toBe('First Name User 1');
-                    done();
-                })
-                .catch((err) => {
-                    expect(1).toBe(err);
-                    done();
                 });
         });
 
