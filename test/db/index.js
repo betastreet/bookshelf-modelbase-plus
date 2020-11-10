@@ -1,19 +1,23 @@
 'use strict'
 
-let fs = require('fs');
-let config = require('./knexfile');
-let knex = require('knex')(config.development);
-let bookshelf = require('bookshelf')(knex);
+const fs = require('fs');
+const config = require('./knexfile');
+const knex = require('knex')(config.development);
+const bookshelf = require('bookshelf')(knex);
+const modelbase = require('../../lib');
 
 // Install all necessary plugins
 bookshelf.plugin(require('../../lib'));
-
+bookshelf.plugin('pagination');
+// bookshelf.plugin(require('bookshelf-prefixed-ordered-uuid'));
+const ModelBase = modelbase(bookshelf);
 
 module.exports = {
-    knex,
-    bookshelf,
+  knex,
+  bookshelf,
+  ModelBase,
 };
 
 // Load all models
 fs.readdirSync(`${__dirname}/models`)
-    .forEach((model) => require(`${__dirname}/models/${model}`));
+  .forEach((model) => require(`${__dirname}/models/${model}`));

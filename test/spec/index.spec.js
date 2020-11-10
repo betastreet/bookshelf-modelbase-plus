@@ -126,6 +126,26 @@ describe('bookshelf-model-base-plus', () => {
             });
         });
 
+        test('should be able to order by multiple', () => {
+          return User
+            .getList({ order_by: ['email', 'first_name'] }, User.columns)
+            .then((models) => {
+              expect(models.toJSON().map(m => m.email)).toEqual([
+                'email@user0.com',
+                'email@user1.com',
+                'email@user2.com',
+              ]);
+            })
+            .then(() => User.getList({ order_by: ['-email', '-first_name'] }))
+            .then((models) => {
+              expect(models.toJSON().map(m => m.email)).toEqual([
+                'email@user2.com',
+                'email@user1.com',
+                'email@user0.com',
+              ]);
+            });
+        });
+
         it('should be able to skip pagination with !paginate', () => {
           return User
             .getList({paginate: 0}, User.columns)
@@ -325,6 +345,15 @@ describe('bookshelf-model-base-plus', () => {
               .getList({ email: 'emailtest@user2.com', limit: 1 }, User.columns)
               .then(models => User.updateOneById({ address: 'Address to delete' }, models.at(0).get('id'), User.columns))
               .then(updatedModel => expect(updatedModel.get('address')).toBe('Address to delete'));
+          });
+
+          it('should update an entry when in query', () => {
+            return User
+              .getList({ email: 'emailtest@user2.com', limit: 1 }, User.columns)
+              .then(models => User.updateOne(
+                { email: 'emailtest-updated', findBy: { email: 'emailtest@user2.com' } },
+                User.columns
+              )).then(updatedModel => expect(updatedModel.get('email')).toBe('emailtest-updated'));
           });
 
           it('should destroy an entry by composite key', () => {
