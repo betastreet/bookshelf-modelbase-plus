@@ -5,6 +5,7 @@
 /* global it */
 /* global expect */
 
+jest.setTimeout(3000);
 jest.disableAutomock();
 
 const mockDb = require('mock-knex');
@@ -33,7 +34,6 @@ Array.prototype.it = function (description, testCaseFunction) {
 };
 
 describe('bookshelf-model-base-plus', () => {
-
     describe('base operations', () => {
         beforeEach(() => {
             return bookshelf.knex('users')

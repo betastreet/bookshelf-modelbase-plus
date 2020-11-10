@@ -1,11 +1,7 @@
 'use strict';
 
-const db = require('../');
+const { ModelBase } = require('../');
 const Joi = require('joi');
-
-db.bookshelf.plugin(require('bookshelf-prefixed-ordered-uuid'));
-
-const ModelBase = require('bookshelf-modelbase')(db.bookshelf);
 
 module.exports = ModelBase.extend({
   tableName: 'categories',
