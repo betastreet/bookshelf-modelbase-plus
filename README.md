@@ -14,14 +14,15 @@ npm i --save bookshelf-modelbase-plus
 
 ## Setup
 ```javascript
-    var db        = require(knex)(require('./knexfile'));
-    var bookshelf = require('bookshelf')(db);
-    var ModelBase = require('bookshelf-modelbase')(bookshelf);
+    const db        = require(knex)(require('./knexfile'));
+    const bookshelf = require('bookshelf')(db);
+    const modelbase = require('bookshelf-modelbase-plus');
 
     // load plugin
     bookshelf.plugin(require('bookshelf-modelbase-plus'));
-    // needs also pagination plugin
-    bookshelf.plugin('pagination');
+    // needs also pagination plugin (older versions of bookshelf)
+    // bookshelf.plugin('pagination');
+    const ModelBase = modelbase(bookshelf);
 
     var Budget = ModelBase.extend({
         tableName: 'budgets',

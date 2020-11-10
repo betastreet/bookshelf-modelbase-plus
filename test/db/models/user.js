@@ -1,8 +1,6 @@
 'use strict';
 
-const db = require('../');
-
-const ModelBase = require('bookshelf-modelbase')(db.bookshelf);
+const { ModelBase } = require('../');
 
 module.exports = ModelBase.extend({
     tableName: 'users',
