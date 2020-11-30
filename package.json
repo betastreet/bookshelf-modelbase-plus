@@ -1,6 +1,6 @@
 {
   "name": "bookshelf-modelbase-plus",
-  "version": "2.11.1",
+  "version": "2.11.2",
   "description": "Extended functionality for REST operations with validation, filtering, ordering, importing records.",
   "main": "./lib",
   "scripts": {
@@ -46,7 +46,7 @@
     "sourceType": "module"
   },
   "dependencies": {
-    "joi": "^14.3.1",
+    "joi": ">=9.x <=14.x",
     "lodash": "^4.17.4"
   },
   "jest": {
