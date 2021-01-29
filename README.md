@@ -56,11 +56,11 @@ npm i --save bookshelf-modelbase-plus
 #### Complex Queries:
 - Supports Arrays for key operator/value, like
 ```js
-  Budget.getList(status: ['=', 'enabled'], ['status'])
+  Budget.getList({status: ['=', 'enabled']}, ['status']);
 ```
 - Supports specifying logic, like
 ```js
-  Budget.getList({a: 2, b: 3, _logic: 'or'})
+  Budget.getList({a: 2, b: 3, _logic: 'or'});
 ```
 - Supports Objects, like:
 ```js
@@ -72,7 +72,7 @@ npm i --save bookshelf-modelbase-plus
 ```
 - Supports array values, like:
 ```js
-  Budget.getList(status: ['IN', ['enabled', 'disabled']], ['status'])
+  Budget.getList({status: ['IN', ['enabled', 'disabled']]}, ['status']);
 ```
 - Supports or/and nesting, like:
 ```js
@@ -113,12 +113,13 @@ A function may optionally be defined on the model to be used when
 specifying `withQuery` in the getList options, similar to `withRelated`.
 This function will then be called with the knex query builder so that
 the model can define custom code to refine the search
-(i.e. join, convert values, etc.)
+(i.e. join, convert values, etc.). This must avoid the following keywords:
+through, fetch, count, fetchOne, create, resetQuery, query, orderBy, sync, clone, _handleResponse, _handleEager
 
 Example:
 ```js
     var Budget = ModelBase.extend({
-        tableName: 'budgets'
+        tableName: 'budgets',
         fancy: (qb, options) => {
           return qb.where({name: options.name + options.name2});
         },
